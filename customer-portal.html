@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Customer Login / Sign Up - Freshly</title>
+<meta name="description" content="Freshly customer login and signup.">
+<link rel="manifest" href="manifest.webmanifest?v=3.0">
+<meta name="theme-color" content="#0f9d58">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Freshly">
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png">
+<link rel="stylesheet" href="assets/styles.css?v=3.7.2">
+<link rel="stylesheet" href="assets/mobile-app.css?v=3.0">
+<link rel="stylesheet" href="assets/freshly-mobile-app-v2.css?v=3.7.2">
+</head>
+<body>
+<div id="statusBox" class="status-box"></div>
+<nav class="nav"><div class="nav-inner">
+  <a class="brand freshly-logo-brand" href="index.html" aria-label="Freshly Home"><img src="assets/freshly-logo-header.png" alt="Freshly"></a>
+  <div class="menu">
+    <a href="index.html">Home</a>
+    <a href="index.html#shop">Shop</a>
+    <a href="track-order.html">Track Order</a>
+    </div>
+  <button class="mobile-toggle" type="button" aria-label="Menu">☰</button>
+</div></nav>
+
+<header class="page-title-compact"><div class="container">
+  <span class="eyebrow">Freshly Customer</span>
+  <h1>Login / Sign Up</h1>
+  <p>Login using your User ID and password. New customers can create an account.</p>
+</div></header>
+
+<main class="section customer-auth-page"><div class="container customer-auth-layout">
+  <section class="card customer-auth-card">
+    <div class="customer-auth-switch">
+      <button class="active" type="button" data-show-auth-tab="login">Login</button>
+      <button type="button" data-show-auth-tab="signup">Sign Up</button>
+    </div>
+
+    <form id="customerPasswordLoginForm" data-customer-auth-form data-auth-tab="login">
+      <input type="hidden" name="AuthMode" value="Login">
+      <h2>Customer Login</h2>
+      <p class="muted">Use your User ID, phone number, email or Freshly ID.</p>
+      <div class="form-grid single">
+        <div><label>User ID / Phone / Email / Freshly ID</label><input class="input" name="UserID" autocomplete="username" required></div>
+        <div><label>Password</label><input class="input" name="Password" type="password" autocomplete="current-password" required></div>
+      </div>
+      <br><button class="btn btn-primary" type="submit">Login</button>
+    </form>
+
+    <form id="customerPortalSignupForm" data-customer-auth-form data-auth-tab="signup" class="hidden">
+      <input type="hidden" name="AuthMode" value="Signup">
+      <h2>Create Customer Account</h2>
+      <p class="muted">Your phone number can also be used as your User ID.</p>
+      <div class="form-grid">
+        <div><label>Name</label><input class="input" name="Name" required></div>
+        <div><label>Phone / WhatsApp</label><input class="input" name="Phone" required></div>
+        <div><label>Email</label><input class="input" name="Email" type="email"></div>
+        <div><label>User ID</label><input class="input" name="UserID" placeholder="Optional"></div>
+        <div><label>Password</label><input class="input" name="Password" type="password" autocomplete="new-password" required></div>
+        <div><label>Confirm Password</label><input class="input" name="ConfirmPassword" type="password" autocomplete="new-password" required></div>
+        <div><label>WhatsApp Updates</label><select class="input" name="WhatsAppOptIn"><option>Yes</option><option>No</option></select></div>
+      </div>
+      <br><button class="btn btn-primary" type="submit">Sign Up</button>
+    </form>
+
+    <div data-customer-portal-status class="notice mini hidden"></div>
+  </section>
+
+  <aside class="card customer-account-card">
+    <h2>My Freshly Account</h2>
+    <div data-customer-state></div>
+    <p class="muted">After login, your name will appear near the customer icon on the top-right side of the mobile app.</p>
+    <div class="button-row">
+      <a class="btn btn-primary" href="index.html#shop">Start Shopping</a>
+      <a class="btn" href="track-order.html">Track Order</a>
+      <button class="btn" type="button" data-logout>Logout</button>
+    </div>
+  </aside>
+</div></main>
+
+<script src="assets/config.js?v=3.7.2"></script>
+<script src="assets/app.js?v=3.7.2"></script>
+<script src="assets/freshly-mobile-app-v2.js?v=3.7.2"></script>
+<script src="assets/freshly-install-app.js?v=3.7.2"></script>
+<script>
+(function(){
+  function show(tab){
+    document.querySelectorAll('[data-auth-tab]').forEach(el=>el.classList.toggle('hidden', el.dataset.authTab !== tab));
+    document.querySelectorAll('[data-show-auth-tab]').forEach(btn=>btn.classList.toggle('active', btn.dataset.showAuthTab === tab));
+  }
+  document.querySelectorAll('[data-show-auth-tab]').forEach(btn=>btn.addEventListener('click',()=>show(btn.dataset.showAuthTab)));
+  if(location.hash === '#signup') show('signup');
+  document.querySelectorAll('#checkoutLoginForm input[name="AuthMode"]').forEach(r=>{
+    r.addEventListener('change',()=>{
+      const signup = r.value === 'Signup' && r.checked;
+      document.querySelectorAll('[data-auth-login-field]').forEach(el=>el.classList.toggle('hidden', signup));
+      document.querySelectorAll('[data-auth-signup-field]').forEach(el=>el.classList.toggle('hidden', !signup));
+      const pw = document.querySelector('#checkoutLoginForm input[name="SignupPassword"]');
+      const real = document.querySelector('#checkoutLoginForm input[name="Password"]');
+      if(signup && pw && real){ real.value = pw.value; }
+    });
+  });
+})();
+</script>
+<script src="assets/freshly-mobile-menu-fix-v34.js?v=3.7.2"></script>
+<script src="assets/freshly-mobile-layout-safe-v368.js?v=3.7.2"></script>
+<script src="assets/freshly-bottom-nav-fix-v371.js?v=3.7.2"></script>
+<script src="assets/freshly-category-route-fix-v372.js?v=3.7.2"></script>
+</body>
+</html>
