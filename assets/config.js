@@ -1,5 +1,5 @@
 window.FRESHLY_CONFIG = {
-  VERSION: '3.8.7',
+  VERSION: '3.8.0',
 
   /*
    * IMPORTANT:
@@ -9,7 +9,7 @@ window.FRESHLY_CONFIG = {
    * Example:
    * BACKEND_URL: 'https://script.google.com/macros/s/AKfycbxxxx/exec',
    */
-  BACKEND_URL: 'https://script.google.com/macros/s/AKfycbwH4VhFLBuq6Ylt_YHkYGz8DeLpS62qO9Y7nNG1owc7krkQssSYEUt2-xF5SZld3KfG/exec',
+  BACKEND_URL: 'https://script.google.com/macros/s/AKfycbxo3bMFQujTWBn_lYxKi8xlOe9apsBpECqj2ufdPENwN7SLFrDs3RMSdKdzdZ-dzEJQBg/exec',
 
   /*
    * Optional quick override without editing files:
@@ -19,13 +19,9 @@ window.FRESHLY_CONFIG = {
    */
   BACKEND_URL_STORAGE_KEY: 'freshlyBackendUrl',
 
-  // Live mode: do not silently show demo products when backend is missing or outdated.
-  LIVE_MODE: true,
-  PUBLIC_DATA_CACHE_SECONDS: 0,
-
   CURRENCY: '₹',
   DEFAULT_COUNTRY: 'India',
-  DEMO_MODE_WHEN_BACKEND_EMPTY: false,
+  DEMO_MODE_WHEN_BACKEND_EMPTY: true,
   DEFAULT_DISTRICT_ID: 'FLY-DST-000001',
   DEFAULT_PINCODE: '673571',
 

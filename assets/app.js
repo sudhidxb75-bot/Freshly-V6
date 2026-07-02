@@ -374,26 +374,13 @@
 
   async function loadPublicData(){
     try{
-      let res = cfg.BACKEND_URL ? await api('getPublicData', {page:'Home'}, 'GET') : null;
-      if(!res || !res.ok){
-        if(cfg.DEMO_MODE_WHEN_BACKEND_EMPTY) res = {ok:true,data:demo};
-        else throw new Error(res?.message || 'Backend URL is not configured or backend did not respond.');
-      }
+      let res = cfg.BACKEND_URL ? await api('getPublicData', {}, 'GET') : null;
+      if(!res || !res.ok){ if(cfg.DEMO_MODE_WHEN_BACKEND_EMPTY) res = {ok:true,data:demo}; else throw new Error(res?.message || 'Backend not configured'); }
       const p = res.data || res;
-      ['categories','products','districts','hubs','areas','slots','districtPricing','banners','countries'].forEach(k => state[k] = (p[k] !== undefined ? p[k] : (cfg.DEMO_MODE_WHEN_BACKEND_EMPTY ? (demo[k] || []) : [])) || []);
-      state.settings = p.settings || (cfg.DEMO_MODE_WHEN_BACKEND_EMPTY ? demo.settings : {}) || {};
+      ['categories','products','districts','hubs','areas','slots','districtPricing','banners','countries'].forEach(k => state[k] = p[k] || demo[k] || []);
+      state.settings = p.settings || demo.settings || {};
       applyConfiguredContacts(); renderLocationSelectors(); renderPromoSlider(); renderCategories(); renderProducts(); renderCheckoutLocationControls(); renderProductDetailsPage();
-      if(p.version && cfg.VERSION && String(p.version) !== String(cfg.VERSION)) console.warn('Freshly backend/frontend version mismatch:', p.version, cfg.VERSION);
-    }catch(err){
-      console.error(err);
-      if(cfg.DEMO_MODE_WHEN_BACKEND_EMPTY){
-        Object.assign(state, demo); applyConfiguredContacts(); renderLocationSelectors(); renderPromoSlider(); renderCategories(); renderProducts(); renderCheckoutLocationControls(); renderProductDetailsPage();
-      } else {
-        state.products=[]; state.banners=[];
-        applyConfiguredContacts(); renderLocationSelectors(); renderPromoSlider(); renderCategories(); renderProducts(); renderCheckoutLocationControls(); renderProductDetailsPage();
-        toast(err.message || 'Could not load catalogue. Check backend URL and deployment.');
-      }
-    }
+    }catch(err){ console.error(err); if(cfg.DEMO_MODE_WHEN_BACKEND_EMPTY){ Object.assign(state, demo); applyConfiguredContacts(); renderLocationSelectors(); renderPromoSlider(); renderCategories(); renderProducts(); renderCheckoutLocationControls(); renderProductDetailsPage(); } else toast('Could not load catalogue. Check backend URL.'); }
   }
 
   function cleanKey_(v){ return String(v || '').trim().toLowerCase().replace(/[^a-z0-9]+/g,''); }
@@ -1612,18 +1599,7 @@
   function table(selector,rows){ const box=document.querySelector(selector); if(!box)return; if(!rows.length){box.innerHTML='<p class="muted">No records to show.</p>';return;} const keys=Object.keys(rows[0]).slice(0,8); box.innerHTML=`<table class="table"><thead><tr>${keys.map(k=>`<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>${rows.slice(0,20).map(r=>`<tr>${keys.map(k=>`<td>${esc(r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`; }
   function demoAdminData(){ return {ok:true,data:{metrics:{'Today Orders':8,'Pending Payments':3,'Pending Approvals':2,'Active Products':27,'Active Hubs':5,'WhatsApp Pending':4,'Customers':128,'Revenue Today':'₹12,450'},recentOrders:[{OrderFreshlyID:'FLY-ORD-000001',CustomerName:'Demo Customer',HubID:'FLY-LHB-000001',Total:560,Status:'Received',PaymentStatus:'Pending'}],products:demo.products,pendingApprovals:[{UpdateID:'UPD-DEMO',SupplierID:'FLY-SUP-000001',ProductID:'FLY-PRD-000001',ApprovalStatus:'Pending'}],freshlyIds:[{FreshlyID:'FLY-CUS-000001',EntityType:'Customer',Name:'Demo Customer',Status:'Active'}],adminUsers:[{AdminFreshlyID:'FLY-ADM-000001',Name:'Super Admin',Role:'Super Admin',Status:'Active'}],whatsappQueue:[{MessageID:'WA-DEMO',RecipientType:'Customer',Status:'Pending'}],settings:[{Key:'WHATSAPP_MODE',Value:'LOG_ONLY'}]}}; }
 
-  async function api(action,data={},method='POST'){
-    if(!cfg.BACKEND_URL) throw new Error('Backend URL is not configured. Please update assets/config.js with your deployed Apps Script Web App URL.');
-    const bust = String(Date.now());
-    if(method==='GET'){
-      const params = new URLSearchParams({action: action, _freshly_v: (cfg.VERSION || '3.8.7'), _t: bust});
-      Object.entries(data || {}).forEach(([k,v])=>{ if(v !== undefined && v !== null && String(v) !== '') params.set(k, v); });
-      const r = await fetch(cfg.BACKEND_URL + '?' + params.toString(), {cache:'no-store'});
-      return await r.json();
-    }
-    const r = await fetch(cfg.BACKEND_URL,{method:'POST',cache:'no-store',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data,_freshly_v:(cfg.VERSION || '3.8.7'),_t:bust})});
-    return await r.json();
-  }
+  async function api(action,data={},method='POST'){ if(!cfg.BACKEND_URL) throw new Error('Backend URL is not configured.'); if(method==='GET'){ const r=await fetch(cfg.BACKEND_URL+'?action='+encodeURIComponent(action)); return await r.json(); } const r=await fetch(cfg.BACKEND_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})}); return await r.json(); }
   function activeRows(rows){ return (rows||[]).filter(r=>String(r.Status||'Active').toLowerCase()==='active' || String(r.Status||'').toLowerCase()==='yes'); }
   function save(k,v){localStorage.setItem(k,JSON.stringify(v));} function load(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f));}catch(e){return f;}}
   function num(v){return (+v||0).toLocaleString('en-IN');} function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
